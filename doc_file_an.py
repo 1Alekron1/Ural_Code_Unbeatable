@@ -34,12 +34,15 @@ def extract_references_list(doc):
         if "СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ".lower() in text or "список литературы" in text:
             last_reference_section_index = i
 
-    # Если раздел найден, начинаем сбор ссылок после него
+    # Если раздел найден, собираем пункты списка литературы
     if last_reference_section_index != -1:
-        for paragraph in doc.paragraphs[last_reference_section_index + 2:]:
-            text = paragraph.text.strip()
-            if text:  # Добавляем ссылки, пока не встретится пустая строка
+        for paragraph in doc.paragraphs[last_reference_section_index + 1:]:
+            # Проверяем, является ли абзац пунктом списка (есть ли нумерация)
+            if paragraph._element.xpath(".//w:numPr"):
                 references.append(paragraph)
+            elif paragraph.text.strip() == "":
+                # Если встретилась пустая строка, считаем конец списка
+                break
 
     return references
 
