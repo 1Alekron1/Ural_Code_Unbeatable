@@ -176,8 +176,9 @@ def main(doc_path):
     doc.save("output_with_notes.docx")
     for i in result:
         print(f"{i}:\n{result[i]}")
+    return result
 
 
 # Использование:
 doc_path = "Бордунов Александр Максимович Отчет по работе.docx"
-main(doc_path)
+result = main(doc_path)
