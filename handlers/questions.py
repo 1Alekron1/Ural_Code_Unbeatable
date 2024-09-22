@@ -39,6 +39,7 @@ async def handle_document(message: Message, state: FSMContext):
     # Отправляем обработанный файл обратно
     processed_file = FSInputFile(processed_file_path)
     await message.answer_document(processed_file)
+
     formatted_message = (
         "**Результаты проверки:**\n\n"
         "**Введение**: {Введение}\n"
@@ -62,12 +63,14 @@ async def handle_document(message: Message, state: FSMContext):
             map(str, result['Неиспользованные ссылки из списка литературы'])) or 'Нет неиспользованных ссылок'
     )
 
-    text_file = open("Review.txt", "w")
+    # text_file = open("Review.txt", "w")
+    #
+    # text_file.write(formatted_message)
+    #
+    # text_file.close()
 
-    text_file.write(formatted_message)
+    save_word_document("Review.docx", formatted_message)
 
-    text_file.close()
-
-    second_file = "Review.txt"
+    second_file = "Review.docx"
     processed_file_2 = FSInputFile(second_file)
     await message.answer_document(processed_file_2)
