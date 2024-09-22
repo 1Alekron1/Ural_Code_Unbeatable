@@ -2,6 +2,7 @@ import re
 
 from docx import Document
 from docx.shared import RGBColor
+from test import analyse_text, check_text
 
 
 def check_structural_elements(doc):
@@ -142,15 +143,29 @@ def extract_section_text(doc, section_name):
     return "\n".join(section_text)  # Собираем текст раздела
 
 
-def main(doc_path):
-    result = {"Введение": "", "Заключение": "", "Найдены разделы": [], "Отсутствуют разделы": [],
+def check(doc_path):
+    entry_criteria = """1) оценка современного состояния решаемой научно-технической проблемы
+        2)  основание и исходные данные для разработки темы 
+        3) обоснование необходимости проведения НИР
+        4) сведения о планируемом научно-техническом уровне разработки, о патентных исследованиях и выводы из них
+        5)  актуальность и новизна темы
+        6) связь данной работы с другими научно-исследовательскими работами.
+        7) цель и задачи исследования"""
+    conclusion_criteria = """1) краткие выводы по результатам выполненной НИР или отдельных ее этапов;
+    2) оценку полноты решений поставленных задач;
+3) разработку рекомендаций и исходных данных по конкретному использованию результатов НИР;
+4) результаты оценки технико-экономической эффективности внедрения;
+5) результаты оценки научно-технического уровня выполненной НИР в сравнении с лучшими достижениями в этой области."""
+
+    result = {"Введение": "", "Заключение": "", "Пересечение Введения и Заключения по смыслу": "", "Найдены разделы": [], "Отсутствуют разделы": [],
               "Найденные ссылки на литературу": [], "Найденные ссылки в тексте": [], "Ошибка": "",
               "Неиспользованные ссылки из списка литературы": []}
     doc = Document(doc_path)
     conclusion = extract_section_text(doc, "Заключение")
     entry = extract_section_text(doc, "Введение")
-    result["Введение"] = entry
-    result["Заключение"] = conclusion
+    result["Введение"] = analyse_text(entry, entry_criteria)
+    result["Заключение"] = analyse_text(conclusion, conclusion_criteria)
+    result["Пересечение Введения и Заключения по смыслу"] = check_text(entry, conclusion)
 
     # Проверка структурных элементов
     missing_sections, found_sections = check_structural_elements(doc)
@@ -176,7 +191,7 @@ def main(doc_path):
         highlight_unused_references(doc, reference_paragraphs, unused_references)
 
     # Сохранение документа с примечаниями
-    doc.save("output_with_notes.docx")
+    doc.save("Исходник с правками.docx")
     for i in result:
         print(f"{i}:\n{result[i]}")
     return result
@@ -184,4 +199,3 @@ def main(doc_path):
 
 # Использование:
 doc_path = "Бордунов Александр Максимович Отчет по работе.docx"
-result = main(doc_path)
