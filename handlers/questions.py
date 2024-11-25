@@ -2,6 +2,7 @@ import asyncio
 from io import BytesIO
 
 from aiogram import Router, F, types
+from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
@@ -16,6 +17,14 @@ def save_word_document(filename, content):
     document = Document()
     document.add_paragraph(content)
     document.save(filename)
+
+@router.message(CommandStart())
+async def start(message: Message):
+    await message.answer(f"Друзья, теперь у каждого из Вас будет свой помощник по НИР и ВКР❤️\n\n"
+                         f"Только представьте соблюдение академических стандартов, правильное оформление, логичную структуру текста и грамотное цитирование.\n\n"
+                         f"Звучит фантастично, не так ли?🤩\n\n"
+                         f"Скорее загружай свой файл на проверку")
+
 
 @router.message(F.document)
 async def handle_document(message: Message, state: FSMContext):
